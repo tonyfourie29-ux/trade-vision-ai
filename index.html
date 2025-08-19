@@ -305,8 +305,13 @@
                 newsList.innerHTML = '<div class="text-xs text-gray-400">Fetching market news...</div>';
                 
                 // Make API call to your Vercel serverless function
-                fetch(`/api/news?pair=${encodeURIComponent(pair)}`)
-                    .then(response => response.json())
+                fetch('/api/news?pair=' + encodeURIComponent(pair))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         if (data.success) {
                             // Clear loading message
@@ -336,7 +341,7 @@
                     })
                     .catch(error => {
                         console.error('Error fetching news:', error);
-                        newsList.innerHTML = '<div class="text-xs text-red-400">Failed to fetch market news</div>';
+                        newsList.innerHTML = '<div class="text-xs text-red-400">Failed to fetch market news. Please try again.</div>';
                     });
             }
             
