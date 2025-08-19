@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         
         res.status(200).json({
             success: true,
-            data: filteredNews,
+             filteredNews,
             timestamp: new Date().toISOString()
         });
     } catch (error) {
