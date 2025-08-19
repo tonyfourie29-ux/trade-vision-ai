@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeVision AI</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #A855F7 0%, #3B82F6 50%, #06B6D4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .signal-buy {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10B981;
+        }
+        .signal-sell {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #EF4444;
+        }
+        .signal-hold {
+            background: rgba(234, 179, 8, 0.2);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: #EAB308;
+        }
+        .animated-gradient {
+            background: linear-gradient(45deg, #1F2937, #111827, #1F2937);
+            background-size: 300% 300%;
+            animation: gradient-shift 8s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body class="animated-gradient min-h-screen text-white">
+    <!-- Background Effects -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-20 -right-20 w-40 h-40 md:w-80 md:h-80 bg-purple-500/10 rounded-full blur-2xl md:blur-3xl animate-pulse"></div>
+        <div class="absolute -bottom-20 -left-20 w-40 h-40 md:w-80 md:h-80 bg-blue-500/10 rounded-full blur-2xl md:blur-3xl animate-pulse delay-1000"></div>
+    </div>
+
+    <div class="relative z-10">
+        <!-- Header -->
+        <header class="backdrop-blur-sm bg-black/40 border-b border-gray-800">
+            <div class="max-w-md mx-auto px-4 py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white lucide lucide-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                    </div>
+                    <h1 class="text-lg md:text-2xl font-bold gradient-text">TradeVision AI</h1>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-md mx-auto px-4 py-6">
+            <!-- Hero Section -->
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold mb-3 gradient-text">AI Forex Analysis</h2>
+                <p class="text-gray-400 text-sm md:text-base">Upload any forex chart for instant AI-powered trading signals</p>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="mb-6">
+                <div id="drop-area" class="border-2 border-dashed border-gray-600 rounded-xl p-6 text-center transition-colors">
+                    <input type="file" id="file-input" accept="image/*" class="hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-3 text-gray-500 lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <div class="space-y-1">
+                        <p class="text-base font-medium text-white">Upload Chart</p>
+                        <p class="text-gray-400 text-xs">Tap to browse or drag image</p>
+                    </div>
+                    <button id="browse-btn" class="mt-3 bg-gradient-to-r from-purple-600 to-cyan-600 text-white text-sm px-4 py-2 rounded-lg font-medium">Choose File</button>
+                    <p class="text-xs text-gray-500 mt-2">PNG, JPG, JPEG supported</p>
+                </div>
+                
+                <!-- Preview -->
+                <div id="preview-container" class="hidden mt-4">
+                    <img id="preview" class="w-full rounded-lg border border-gray-700" alt="Chart preview">
+                    <button id="clear-btn" class="mt-2 bg-red-500 text-white text-xs px-3 py-1 rounded">Remove</button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results" class="hidden">
+                <div class="bg-black/40 backdrop-blur-sm rounded-xl p-4 border border-gray-800">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 id="pair-name" class="font-bold text-white">EUR/USD Analysis</h3>
+                            <p class="text-gray-400 text-xs" id="timeframe">Timeframe: 1H</p>
+                        </div>
+                        <span id="signal-badge" class="px-2 py-1 rounded text-xs font-medium">Buy</span>
+                    </div>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Pattern</span>
+                            <span class="text-white" id="pattern">Ascending Triangle</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Confidence</span>
+                            <span class="text-white" id="confidence">85%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Price</span>
+                            <span class="text-white" id="price">1.08542</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 p-3 bg-black/40 rounded">
+                        <p class="text-gray-300 text-xs" id="analysis-text">
+                            Bullish pattern detected with strong volume confirmation. Consider long position with proper risk management.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="border-t border-gray-800 mt-8">
+            <div class="max-w-md mx-auto px-4 py-3 text-center">
+                <p class="text-gray-500 text-xs">TradeVision AI © 2024 • Educational purposes only</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Mobile-optimized JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-input');
+            const browseBtn = document.getElementById('browse-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const previewContainer = document.getElementById('preview-container');
+            const preview = document.getElementById('preview');
+            const results = document.getElementById('results');
+            const dropArea = document.getElementById('drop-area');
+            
+            // Result elements
+            const pairName = document.getElementById('pair-name');
+            const timeframeEl = document.getElementById('timeframe');
+            const patternEl = document.getElementById('pattern');
+            const confidenceEl = document.getElementById('confidence');
+            const priceEl = document.getElementById('price');
+            const analysisText = document.getElementById('analysis-text');
+            const signalBadge = document.getElementById('signal-badge');
+            
+            // Forex data
+            const pairs = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CAD', 'NZD/USD', 'EUR/GBP', 'EUR/JPY'];
+            const timeframes = ['1M', '5M', '15M', '30M', '1H', '4H', '1D', '1W'];
+            const patterns = ['Head & Shoulders', 'Double Top', 'Double Bottom', 'Ascending Triangle', 'Descending Triangle', 'Bullish Flag', 'Bearish Flag'];
+            
+            // Event listeners
+            browseBtn.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', handleFile);
+            
+            clearBtn.addEventListener('click', clearImage);
+            
+            // Drag and drop (works on mobile browsers that support it)
+            ['dragenter', 'dragover'].forEach(event => {
+                dropArea.addEventListener(event, preventDefaults, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(event => {
+                dropArea.addEventListener(event, highlight, false);
+            });
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight(e) {
+                if (e.type === 'dragenter' || e.type === 'dragover') {
+                    dropArea.style.borderColor = '#8B5CF6';
+                } else {
+                    dropArea.style.borderColor = '#4B5563';
+                }
+            }
+            
+            function handleDrop(e) {
+                preventDefaults(e);
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length) {
+                    fileInput.files = files;
+                    handleFile({target: fileInput});
+                }
+            }
+            
+            function handleFile(e) {
+                const file = e.target.files[0];
+                if (file && file.type.match('image.*')) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        preview.src = event.target.result;
+                        previewContainer.classList.remove('hidden');
+                        browseBtn.textContent = 'Analyze Chart';
+                        browseBtn.onclick = analyzeChart;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            function clearImage() {
+                fileInput.value = '';
+                previewContainer.classList.add('hidden');
+                results.classList.add('hidden');
+                browseBtn.textContent = 'Choose File';
+                browseBtn.onclick = () => fileInput.click();
+            }
+            
+            function analyzeChart() {
+                // Show loading
+                browseBtn.textContent = 'Analyzing...';
+                browseBtn.disabled = true;
+                
+                // Simulate AI analysis
+                setTimeout(() => {
+                    // Generate random but realistic results
+                    const pair = pairs[Math.floor(Math.random() * pairs.length)];
+                    const timeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
+                    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+                    const confidence = Math.floor(Math.random() * 30) + 70; // 70-99%
+                    const price = (1.0 + Math.random() * 0.2).toFixed(5);
+                    
+                    // Determine signal based on confidence
+                    let signal = 'No Entry';
+                    if (confidence > 85) {
+                        signal = Math.random() > 0.5 ? 'Buy' : 'Sell';
+                    } else if (confidence > 75) {
+                        signal = Math.random() > 0.6 ? 'Buy' : (Math.random() > 0.6 ? 'Sell' : 'No Entry');
+                    }
+                    
+                    // Update UI
+                    pairName.textContent = `${pair} Analysis`;
+                    timeframeEl.textContent = `Timeframe: ${timeframe}`;
+                    patternEl.textContent = pattern;
+                    confidenceEl.textContent = `${confidence}%`;
+                    priceEl.textContent = price;
+                    
+                    // Set signal badge
+                    signalBadge.className = `px-2 py-1 rounded text-xs font-medium ${
+                        signal === 'Buy' ? 'signal-buy' :
+                        signal === 'Sell' ? 'signal-sell' : 'signal-hold'
+                    }`;
+                    signalBadge.textContent = signal;
+                    
+                    // Analysis text
+                    let analysis = '';
+                    if (signal === 'Buy') {
+                        analysis = `Strong bullish pattern detected in ${pair} on ${timeframe} timeframe. Confidence level: ${confidence}%. Consider long position with appropriate risk management.`;
+                    } else if (signal === 'Sell') {
+                        analysis = `Bearish pattern identified in ${pair} on ${timeframe} timeframe. Confidence level: ${confidence}%. Consider short position with proper risk controls.`;
+                    } else {
+                        analysis = `Market conditions are uncertain for ${pair}. Confidence level: ${confidence}%. No clear entry signal at this time. Wait for better opportunities.`;
+                    }
+                    
+                    analysisText.textContent = analysis;
+                    
+                    // Show results
+                    results.classList.remove('hidden');
+                    browseBtn.textContent = 'Analyze Again';
+                    browseBtn.disabled = false;
+                    browseBtn.onclick = () => {
+                        results.classList.add('hidden');
+                        browseBtn.textContent = 'Analyze Chart';
+                    };
+                }, 1500);
+            }
+            
+            // Initialize
+            browseBtn.onclick = () => fileInput.click();
+        });
+    </script>
+</body>
+</html>
