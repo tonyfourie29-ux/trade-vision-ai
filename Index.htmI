@@ -42,6 +42,13 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
+        .news-item {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="animated-gradient min-h-screen text-white">
@@ -102,6 +109,15 @@
                         <span id="signal-badge" class="px-2 py-1 rounded text-xs font-medium">Buy</span>
                     </div>
                     
+                    <!-- News Section -->
+                    <div id="news-section" class="mt-3 p-3 bg-black/40 rounded border border-gray-700 mb-3">
+                        <h4 class="font-semibold text-sm text-cyan-400 mb-2">Market News</h4>
+                        <div id="news-list" class="space-y-2">
+                            <!-- News items will be added here -->
+                            <div class="text-xs text-gray-400">Fetching latest market news...</div>
+                        </div>
+                    </div>
+                    
                     <div class="space-y-2 text-xs">
                         <div class="flex justify-between">
                             <span class="text-gray-400">Pattern</span>
@@ -152,11 +168,15 @@
             const priceEl = document.getElementById('price');
             const analysisText = document.getElementById('analysis-text');
             const signalBadge = document.getElementById('signal-badge');
+            const newsList = document.getElementById('news-list');
             
             // Forex data
             const pairs = ['EUR/USD', 'GBP/USD', 'USD/JPY', 'AUD/USD', 'USD/CAD', 'NZD/USD', 'EUR/GBP', 'EUR/JPY'];
             const timeframes = ['1M', '5M', '15M', '30M', '1H', '4H', '1D', '1W'];
             const patterns = ['Head & Shoulders', 'Double Top', 'Double Bottom', 'Ascending Triangle', 'Descending Triangle', 'Bullish Flag', 'Bearish Flag'];
+            
+            // Your Alpha Vantage API key (this is just a placeholder - never expose real key in frontend)
+            const ALPHA_VANTAGE_API_KEY = 'demo'; // Replace with your key in a secure backend
             
             // Event listeners
             browseBtn.addEventListener('click', () => fileInput.click());
@@ -269,6 +289,9 @@
                     
                     analysisText.textContent = analysis;
                     
+                    // Fetch real news (simulated for now)
+                    fetchMarketNews(pair);
+                    
                     // Show results
                     results.classList.remove('hidden');
                     browseBtn.textContent = 'Analyze Again';
@@ -278,6 +301,65 @@
                         browseBtn.textContent = 'Analyze Chart';
                     };
                 }, 1500);
+            }
+            
+            function fetchMarketNews(pair) {
+                // In a real application, this would call your Alpha Vantage API
+                // But since we can't expose the API key in frontend code, we'll simulate it
+                
+                newsList.innerHTML = '<div class="text-xs text-gray-400">Fetching market news...</div>';
+                
+                // Simulate API delay
+                setTimeout(() => {
+                    const baseCurrency = pair.split('/')[0];
+                    const quoteCurrency = pair.split('/')[1];
+                    
+                    // In a real app, you would make API calls like:
+                    // const forexNewsUrl = `https://www.alphavantage.co/query?function=NEWS_SENTIMENT&topics=forex&apikey=${ALPHA_VANTAGE_API_KEY}`;
+                    
+                    const mockNews = [
+                        {
+                            title: `${baseCurrency} Economic Data Shows Strong Recovery`,
+                            source: 'Financial Times',
+                            sentiment: 'positive',
+                            summary: `Recent indicators show unexpected growth in ${baseCurrency} economy, boosting currency strength.`
+                        },
+                        {
+                            title: `${quoteCurrency} Central Bank Signals Rate Changes`,
+                            source: 'Bloomberg',
+                            sentiment: 'negative',
+                            summary: `Potential interest rate adjustments could impact ${quoteCurrency} currency value and economic growth.`
+                        },
+                        {
+                            title: `Market Volatility Affects ${pair} Trading`,
+                            source: 'MarketWatch',
+                            sentiment: 'neutral',
+                            summary: `Traders remain cautious amid ongoing geopolitical developments and economic uncertainty.`
+                        }
+                    ];
+                    
+                    // Clear loading message
+                    newsList.innerHTML = '';
+                    
+                    // Add news items
+                    mockNews.forEach(news => {
+                        const newsItem = document.createElement('div');
+                        newsItem.className = 'news-item border-b border-gray-700 pb-2 last:border-b-0 last:pb-0';
+                        newsItem.innerHTML = `
+                            <div class="flex justify-between items-start mb-1">
+                                <h5 class="font-medium text-white text-xs">${news.title}</h5>
+                                <span class="px-1 py-0.5 text-xs rounded ${
+                                    news.sentiment === 'positive' ? 'bg-green-500/20 text-green-400' :
+                                    news.sentiment === 'negative' ? 'bg-red-500/20 text-red-400' :
+                                    'bg-gray-500/20 text-gray-400'
+                                }">${news.sentiment}</span>
+                            </div>
+                            <p class="text-gray-400 text-xs mb-1">${news.summary}</p>
+                            <p class="text-gray-500 text-xs">${news.source}</p>
+                        `;
+                        newsList.appendChild(newsItem);
+                    });
+                }, 1000);
             }
             
             // Initialize
